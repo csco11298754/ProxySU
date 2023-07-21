@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    
+
     <!--common-->
     <sys:String x:Key="Random">Random</sys:String>
     <sys:String x:Key="Save">Save</sys:String>
@@ -22,6 +22,7 @@
     <sys:String x:Key="MainMenuLanguageEn">English</sys:String>
     <sys:String x:Key="MainMenuLanguageCn">中文</sys:String>
     <sys:String x:Key="MainMenuLanguageTw">正體</sys:String>
+    <sys:String x:Key="MainMenuLanguageFr">فارسی</sys:String>
 
     <sys:String x:Key="MainMenuHelper">Helper</sys:String>
     <sys:String x:Key="MainMenuHelperGithub">Github</sys:String>
@@ -39,7 +40,7 @@
     <sys:String x:Key="MainDataGridColumnActionViewConfig">ViewConfig</sys:String>
     <sys:String x:Key="MainDataGridColumnActionDelete">Delete</sys:String>
     <sys:String x:Key="MainDataGridColumnActionSortUp">Up</sys:String>
-    <sys:String x:Key="MainDataGridColumnActionSortDone">Done</sys:String>
+    <sys:String x:Key="MainDataGridColumnActionSortDone">Down</sys:String>
 
 
     <!--Editor Window-->
@@ -53,6 +54,7 @@
     <sys:String x:Key="HostUploadSecretKey">UploadKey</sys:String>
     <sys:String  x:Key="HostSertTypePassword">Password</sys:String>
     <sys:String  x:Key="HostSertTypePrivateKey">PrivateKey</sys:String>
+    <sys:String x:Key="HostSertTypePrivateKeyPassPhrase">PKPassword</sys:String>
 
 
     <sys:String x:Key="ProxyGroupName">Proxy</sys:String>
@@ -64,43 +66,61 @@
     <sys:String x:Key="ProxyTypeNone">None</sys:String>
     <sys:String x:Key="ProxyTypeHttp">Http</sys:String>
     <sys:String x:Key="ProxyTypeSocks5">Socks5</sys:String>
-
     
+    <!--editor-->
+    <sys:String x:Key="EditorProxyType" xml:space="preserve">Proxy Type</sys:String>
+    <sys:String x:Key="EditorProxyParams" xml:space="preserve">Params</sys:String>
+
     <!--Xray-->
-    <sys:String x:Key="VlessXtlsDesc" xml:space="preserve">VLESS over TCP With XTLS&#x0a;Preferred</sys:String>
-    <sys:String x:Key="VlessTcpDesc" xml:space="preserve">VLESS over TCP with TLS&#x0a;XTLS is Preferred</sys:String>
-    <sys:String x:Key="VlessWsDesc" xml:space="preserve">VLESS over WS with TLS&#x0a;Support CDN</sys:String>
-    <sys:String x:Key="VlessKcpDesc" xml:space="preserve">VLESS mKCP&#x0a;low delay，without Domain</sys:String>
-    <sys:String x:Key="VmessWsDesc" xml:space="preserve">VMESS over WS with TLS&#x0a;Support CDN</sys:String>
-    <sys:String x:Key="VmessKcpDesc" xml:space="preserve">VMESS mKCP&#x0a;low delay，without Domian</sys:String>
-    <sys:String x:Key="SSDesc" xml:space="preserve">ShadowSocks&#x0a;Support UDP，without Domain</sys:String>
-    <sys:String x:Key="TrojanDesc" xml:space="preserve">Trojan over TCP with TLS&#x0a;Trojan</sys:String>
+    <sys:String x:Key="VlessXtlsDesc" xml:space="preserve">VLESS XTLS</sys:String>
+    <sys:String x:Key="VlessTcpDesc" xml:space="preserve">VLESS TCP</sys:String>
+    <sys:String x:Key="VlessWsDesc" xml:space="preserve">VLESS WS</sys:String>
+    <sys:String x:Key="VlessRpcDesc" xml:space="preserve">VLESS gRPC</sys:String>
+    <sys:String x:Key="VlessKcpDesc" xml:space="preserve">VLESS mKCP</sys:String>
+    <sys:String x:Key="VlessQuicDesc" xml:space="preserve">VLESS QUIC</sys:String>
+    <sys:String x:Key="VmessWsDesc" xml:space="preserve">VMESS WS</sys:String>
+    <sys:String x:Key="VmessKcpDesc" xml:space="preserve">VMESS mKCP</sys:String>
+    <sys:String x:Key="VmessQuicDesc" xml:space="preserve">VMESS QUIC</sys:String>
+    <sys:String x:Key="SSDesc" xml:space="preserve">ShadowSocks</sys:String>
+    <sys:String x:Key="TrojanDesc" xml:space="preserve">Trojan</sys:String>
 
     <sys:String x:Key="XrayDomain">Domain/IP</sys:String>
     <sys:String x:Key="XrayMarkDomain">Redir Url</sys:String>
     <sys:String x:Key="XrayWithTLS">With TLS</sys:String>
     <sys:String x:Key="XrayWithTLSDesc">Unchecked means upload your own TLS.</sys:String>
     <sys:String x:Key="XrayUUID">UUID</sys:String>
+    <sys:String x:Key="Flow">Flow</sys:String>
+    <sys:String x:Key="UTLS">uTLS</sys:String>
     <sys:String x:Key="MultiUser">Multi User</sys:String>
     <sys:String x:Key="MultiUserHelp">Multi Id split with ","</sys:String>
     <sys:String x:Key="VlessWsPath">VLESS WS Path</sys:String>
     <sys:String x:Key="VlessKcpSeed">VLESS KCP Seed</sys:String>
     <sys:String x:Key="VlessKcpType">VLESS KCP Type</sys:String>
     <sys:String x:Key="VlessKcpPort">VLESS KCP Port</sys:String>
+    <sys:String x:Key="VlessQuicPort">VLESS QUIC Port</sys:String>
+    <sys:String x:Key="VlessQuicKey">VLESS QUIC Key</sys:String>
+    <sys:String x:Key="VlessQuicSecurity">VLESS QUIC Security</sys:String>
+    <sys:String x:Key="VlessQuicType">VLESS QUIC Type</sys:String>
     <sys:String x:Key="VlessRPCName">gRPC Service Name</sys:String>
     <sys:String x:Key="VlessRPCPort">gRPC Port</sys:String>
     <sys:String x:Key="VmessWsPath">VMESS WS Path</sys:String>
     <sys:String x:Key="VmessKcpSeed">VMESS KCP Seed</sys:String>
     <sys:String x:Key="VmessKcpType">VMESS KCP Type</sys:String>
     <sys:String x:Key="VmessKcpPort">VMESS KCP Port</sys:String>
+    <sys:String x:Key="VmessQuicKey">VMESS QUIC Key</sys:String>
+    <sys:String x:Key="VmessQuicPort">VMESS QUIC Port</sys:String>
+    <sys:String x:Key="VmessQuicSecurity">VMESS QUIC Security</sys:String>
+    <sys:String x:Key="VmessQuicType">VMESS QUIC Type</sys:String>    
     <sys:String x:Key="SSPassword">SS Pwd</sys:String>
     <sys:String x:Key="SSMethods">SS Method</sys:String>
     <sys:String x:Key="SSPort">SS Port</sys:String>
     <sys:String x:Key="TrojanPassword">Trojan Pwd</sys:String>
     <sys:String x:Key="TrojanPort">Trojan Port</sys:String>
+    <sys:String x:Key="V2rayPort">v2ray Port</sys:String>
     <sys:String x:Key="XrayPort">xray Port</sys:String>
     <sys:String x:Key="XrayPortDefault">default port is 443</sys:String>
-    
+    <sys:String x:Key="MoreParameters">More Parameters</sys:String>
+
     <!--xray installer-->
     <sys:String x:Key="XrayInstallerInstall">Install</sys:String>
     <sys:String x:Key="XrayInstallerUpdateSettings">UpdateSettings</sys:String>
@@ -119,11 +139,26 @@
     <sys:String x:Key="TrojanGoMaskDomain">GuiseHost</sys:String>
     <sys:String x:Key="TrojanGoWebSocketPath">WS Path</sys:String>
     <sys:String x:Key="TrojanGoWebSocketDomain">WS Domain</sys:String>
-    
+
     <!--Naive Proxy-->
     <sys:String x:Key="NaiveProxyDomain">Address</sys:String>
     <sys:String x:Key="NaiveProxyPort">Port</sys:String>
     <sys:String x:Key="NaiveProxyUserName">UserName</sys:String>
     <sys:String x:Key="NaiveProxyPassword">Password</sys:String>
     <sys:String x:Key="NaiveProxyMaskDomain">GuiseHost</sys:String>
+
+    <!--MTProto Go-->
+    <sys:String x:Key="MTProtoDomain">Address</sys:String>
+    <sys:String x:Key="MTProtoPort">Port</sys:String>
+    <sys:String x:Key="MTProtoCleartext">Cleantext</sys:String>
+    <sys:String x:Key="MTProtoSecretText">Secret</sys:String>
+    
+    <!--Hysteria-->
+    <sys:String x:Key="HysteriaDomain">Address</sys:String>
+    <sys:String x:Key="HysteriaPort">Port</sys:String>
+    <sys:String x:Key="HysteriaObfs">OBFS</sys:String>
+    <sys:String x:Key="HysteriaProtocol">Protocol</sys:String>
+    <sys:String x:Key="HysteriaEmail">Email</sys:String>
+    <sys:String x:Key="HysteriaUpMbps">UpMbps</sys:String>
+    <sys:String x:Key="HysteriaDownMbps">DownMbps</sys:String>
 </ResourceDictionary>

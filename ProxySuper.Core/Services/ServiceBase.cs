@@ -1,4 +1,6 @@
-﻿using ProxySuper.Core.Helpers;
+﻿using MvvmCross;
+using MvvmCross.Navigation;
+using ProxySuper.Core.Helpers;
 using ProxySuper.Core.Models;
 using ProxySuper.Core.Models.Hosts;
 using ProxySuper.Core.Models.Projects;
@@ -9,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Navigation;
 
 namespace ProxySuper.Core.Services
 {
@@ -30,7 +34,6 @@ namespace ProxySuper.Core.Services
     {
         private Host _host;
 
-
         private SshClient _sshClient;
 
         private ProjectProgress _progress;
@@ -41,7 +44,11 @@ namespace ProxySuper.Core.Services
 
             Settings = settings;
 
-            _sshClient = new SshClient(CreateConnectionInfo());
+            var connection = CreateConnectionInfo();
+            if (connection != null)
+            {
+                _sshClient = new SshClient(connection);
+            }
 
             _progress = new ProjectProgress();
 
@@ -54,6 +61,8 @@ namespace ProxySuper.Core.Services
             IPv6 = string.Empty;
 
             IsOnlyIPv6 = false;
+
+            NavigationService = Mvx.IoCProvider.Resolve<IMvxNavigationService>();
         }
 
         public string RunCmd(string command)
@@ -89,12 +98,20 @@ namespace ProxySuper.Core.Services
 
         public bool IsOnlyIPv6 { get; set; }
 
+        public IMvxNavigationService NavigationService { get; set; }
+
 
         #region 公用方法
         public void Connect()
         {
             Task.Run(() =>
             {
+                if (_sshClient == null)
+                {
+                    MessageBox.Show("无法建立连接，连接参数有误！");
+                    return;
+                }
+
                 if (_sshClient.IsConnected == false)
                 {
                     Progress.Desc = ("正在与服务器建立连接");
@@ -115,7 +132,7 @@ namespace ProxySuper.Core.Services
         {
             Task.Run(() =>
             {
-                _sshClient.Disconnect();
+                _sshClient?.Disconnect();
             });
         }
 
@@ -181,7 +198,7 @@ namespace ProxySuper.Core.Services
                 Progress.Desc = ($"本机IP({IPv6})");
                 if (IPv6 != domainIP)
                 {
-                    throw new Exception("域名解析地址与服务器IP不匹配！");
+                    //throw new Exception("域名解析地址与服务器IP不匹配！");
                 }
             }
             else
@@ -190,7 +207,7 @@ namespace ProxySuper.Core.Services
                 Progress.Desc = ($"域名IP({domainIP})");
                 if (IPv4 != domainIP)
                 {
-                    throw new Exception("域名解析地址与服务器IP不匹配！");
+                    //throw new Exception("域名解析地址与服务器IP不匹配！");
                 }
             }
         }
@@ -272,7 +289,7 @@ namespace ProxySuper.Core.Services
             #endregion
 
             // 安装证书
-            Progress.Desc = ("安装Xray证书");
+            Progress.Desc = ("安装TLS证书");
             RunCmd($"mkdir -p {dirPath}");
             RunCmd($"/root/.acme.sh/acme.sh  --installcert  -d {Settings.Domain}  --certpath {certPath} --keypath {keyPath}  --capath {certPath}");
 
@@ -310,10 +327,9 @@ namespace ProxySuper.Core.Services
             var result = RunCmd("id -u");
             if (!result.Equals("0\n"))
             {
-                throw new Exception("ProxySU需要使用Root用户进行安装！");
+                throw new Exception("请使用Root权限账户登录！");
             }
         }
-
 
         public void UninstallCaddy()
         {
@@ -349,6 +365,9 @@ namespace ProxySuper.Core.Services
 
         public void InstallSystemTools()
         {
+            Progress.Desc = ("更新安装包");
+            RunUpdateCmd();
+
             Progress.Desc = ("安装sudo工具");
             InstallSoftware("sudo");
 
@@ -393,7 +412,7 @@ namespace ProxySuper.Core.Services
             string cmd;
 
             Progress.Desc = ("检测IPv4");
-            cmd = RunCmd(@"curl -s https://api.ip.sb/ip --ipv4 --max-time 8");
+            cmd = RunCmd(@"curl -4 ip.sb");
             IPv4 = cmd.TrimEnd('\r', '\n');
 
             Progress.Desc = ($"IPv4地址为{IPv4}");
@@ -404,7 +423,7 @@ namespace ProxySuper.Core.Services
             else
             {
                 Progress.Desc = ("检测IPv6");
-                cmd = RunCmd(@"curl -s https://api.ip.sb/ip --ipv6 --max-time 8");
+                cmd = RunCmd(@"curl -6 ip.sb");
                 IPv6 = cmd.TrimEnd('\r', '\n');
                 Progress.Desc = ($"IPv6地址为{IPv6}");
 
@@ -561,6 +580,15 @@ namespace ProxySuper.Core.Services
             RunCmd("mv /etc/resolv.conf.proxysu /etc/resolv.conf");
         }
 
+        protected void AppendCommand(string command)
+        {
+            if (!command.EndsWith("\n"))
+            {
+                command += "\n";
+            }
+            Progress.Logs += command;
+        }
+
         private List<string> FilterFastestIP()
         {
             string[] gateNat64 = {
@@ -651,6 +679,8 @@ namespace ProxySuper.Core.Services
                     RunCmd("systemctl restart firewalld");
                 }
 
+                // 保持 ssh 端口开放
+                RunCmd($"firewall-cmd --add-port={_host.Port}/tcp --permanent");
                 foreach (var port in portList)
                 {
                     RunCmd($"firewall-cmd --add-port={port}/tcp --permanent");
@@ -668,6 +698,8 @@ namespace ProxySuper.Core.Services
                     RunCmd("echo y | ufw enable");
                 }
 
+                // 保持 ssh 端口开放
+                RunCmd($"ufw allow {_host.Port}/tcp");
                 foreach (var port in portList)
                 {
                     RunCmd($"ufw allow {port}/tcp");
@@ -739,46 +771,72 @@ namespace ProxySuper.Core.Services
             }
         }
 
-        private void AppendCommand(string command)
+        private void RunUpdateCmd()
         {
-            if (!command.EndsWith("\n"))
+            if (CmdType == CmdType.Apt)
             {
-                command += "\n";
+                RunCmd($"apt update -y");
             }
-            Progress.Logs += command;
+            else if (CmdType == CmdType.Yum)
+            {
+                RunCmd($"yum update -y");
+            }
+            else
+            {
+                RunCmd($"dnf update -y");
+            }
         }
+
 
         private ConnectionInfo CreateConnectionInfo()
         {
-            var authMethods = new List<AuthenticationMethod>();
-
-            if (!string.IsNullOrEmpty(_host.Password))
+            try
             {
-                authMethods.Add(new PasswordAuthenticationMethod(_host.UserName, _host.Password));
-            }
+                var authMethods = new List<AuthenticationMethod>();
 
-            if (_host.SecretType == LoginSecretType.PrivateKey)
-            {
-                authMethods.Add(new PrivateKeyAuthenticationMethod(_host.UserName, new PrivateKeyFile(_host.PrivateKeyPath)));
-            }
+                if (_host.SecretType == LoginSecretType.Password)
+                {
+                    authMethods.Add(new PasswordAuthenticationMethod(_host.UserName, _host.Password));
+                }
 
-            if (_host.Proxy.Type == ProxyTypes.None)
-            {
+                if (_host.SecretType == LoginSecretType.PrivateKey)
+                {
+                    PrivateKeyFile keyFile;
+                    if (string.IsNullOrEmpty(_host.PrivateKeyPassPhrase))
+                    {
+                        keyFile = new PrivateKeyFile(_host.PrivateKeyPath);
+                    }
+                    else
+                    {
+                        keyFile = new PrivateKeyFile(_host.PrivateKeyPath, _host.PrivateKeyPassPhrase);
+                    }
+                    authMethods.Add(new PrivateKeyAuthenticationMethod(_host.UserName, keyFile));
+                }
+
+                if (_host.Proxy.Type == ProxyTypes.None)
+                {
+                    return new ConnectionInfo(
+                        host: _host.Address,
+                        username: _host.UserName,
+                        port: _host.Port,
+                        authenticationMethods: authMethods.ToArray());
+                }
+
                 return new ConnectionInfo(
                     host: _host.Address,
+                    port: _host.Port,
                     username: _host.UserName,
+                    proxyType: _host.Proxy.Type,
+                    proxyHost: _host.Proxy.Address,
+                    proxyPort: _host.Proxy.Port,
+                    proxyUsername: _host.Proxy.UserName, proxyPassword: _host.Proxy.Password,
                     authenticationMethods: authMethods.ToArray());
             }
-
-            return new ConnectionInfo(
-                host: _host.Address,
-                port: _host.Port,
-                username: _host.UserName,
-                proxyType: _host.Proxy.Type,
-                proxyHost: _host.Proxy.Address,
-                proxyPort: _host.Proxy.Port,
-                proxyUsername: _host.Proxy.UserName, proxyPassword: _host.Proxy.Password,
-                authenticationMethods: authMethods.ToArray());
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿using ProxySuper.Core.Models.Hosts;
 using ProxySuper.Core.Models.Projects;
+using ProxySuper.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +70,11 @@ namespace ProxySuper.Core.Services
                     Progress.Percentage = 100;
                     Progress.Step = "安装Brook成功";
                     Progress.Desc = "安装Brook成功";
+
+                    AppendCommand("分享连接：");
+                    AppendCommand(ShareLink.BuildBrook(Settings));
+
+                    NavigationService.Navigate<BrookConfigViewModel, BrookSettings>(Settings);
                 }
                 catch (Exception ex)
                 {

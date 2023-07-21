@@ -22,6 +22,7 @@
                     BorderThickness="1,0,1,0" 
                     BorderBrush="#DDD" 
                     TabStripPlacement="Left"
+                    x:Name="TabCtrl"
                     SelectionChanged="BuildQrCode">
             <TabItem Width="200" Height="40"
                      Tag="{x:Static models:RayType.VLESS_TCP}"
@@ -42,6 +43,13 @@
                      IsEnabled="{Binding Checked_VLESS_KCP}"
                      Header="VLESS-mKCP">
                 <ctrl:VLESS_KCP_Control />
+            </TabItem>
+
+            <TabItem Width="200" Height="40"
+                     Tag="{x:Static models:RayType.VLESS_QUIC}"
+                     IsEnabled="{Binding Checked_VLESS_QUIC}"
+                     Header="VLESS-QUIC">
+                <ctrl:VLESS_QUIC_Control />
             </TabItem>
 
             <TabItem Width="200" Height="40"
@@ -70,6 +78,13 @@
                      IsEnabled="{Binding Checked_VMESS_KCP}"
                      Header="VMESS-mKCP">
                 <ctrl:VMESS_KCP_Control />
+            </TabItem>
+
+            <TabItem Width="200" Height="40"
+                     Tag="{x:Static models:RayType.VMESS_QUIC}"
+                     IsEnabled="{Binding Checked_VLESS_QUIC}"
+                     Header="VMESS-QUIC">
+                <ctrl:VMESS_QUIC_Control />
             </TabItem>
 
             <TabItem Width="200" Height="40"     

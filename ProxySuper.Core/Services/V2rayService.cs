@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using ProxySuper.Core.Models.Hosts;
 using ProxySuper.Core.Models.Projects;
+using ProxySuper.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -77,6 +78,7 @@ namespace ProxySuper.Core.Services
                     EnableBBR();
 
                     Progress.Desc = "重启V2ray服务";
+
                     RunCmd("systemctl restart caddy");
                     RunCmd("systemctl restart v2ray");
 
@@ -87,6 +89,10 @@ namespace ProxySuper.Core.Services
                     if (!Settings.WithTLS)
                     {
                         Progress.Step = "安装成功，请上传您的 TLS 证书。";
+                    }
+                    else
+                    {
+                        NavigationService.Navigate<V2rayConfigViewModel, V2raySettings>(Settings);
                     }
                 }
                 catch (Exception ex)
@@ -236,6 +242,11 @@ namespace ProxySuper.Core.Services
                     Progress.Percentage = 0;
                     Progress.Step = "续签证书";
 
+                    Progress.Desc = "检测系统环境";
+                    EnsureRootUser();
+                    EnsureSystemEnv();
+
+                    Progress.Desc = "安装证书";
                     InstallCert(
                             dirPath: "/usr/local/etc/v2ray/ssl",
                             certName: "v2ray_ssl.crt",
@@ -379,6 +390,7 @@ namespace ProxySuper.Core.Services
             RunCmd($"sed -i 's/CapabilityBoundingSet=/#CapabilityBoundingSet=/g' /etc/systemd/system/v2ray.service");
             RunCmd($"sed -i 's/AmbientCapabilities=/#AmbientCapabilities=/g' /etc/systemd/system/v2ray.service");
             RunCmd($"systemctl daemon-reload");
+            RunCmd("systemctl enable v2ray");
 
             if (FileExists("/usr/local/etc/v2ray/config.json"))
             {

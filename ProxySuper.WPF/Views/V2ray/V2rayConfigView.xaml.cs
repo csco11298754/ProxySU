@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using MvvmCross.Platforms.Wpf.Presenters.Attributes;
 using MvvmCross.Platforms.Wpf.Views;
 using ProxySuper.Core.Models.Projects;
 using ProxySuper.Core.ViewModels;
@@ -21,14 +22,28 @@ using System.Windows.Shapes;
 
 namespace ProxySuper.WPF.Views.V2ray
 {
-    /// <summary>
-    /// V2rayConfigView.xaml 的交互逻辑
-    /// </summary>
+    [MvxWindowPresentation]
     public partial class V2rayConfigView : MvxWindow
     {
         public V2rayConfigView()
         {
             InitializeComponent();
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+
+            for (int i = 0; i < TabCtrl.Items.Count; i++)
+            {
+                var tabItem = TabCtrl.Items[i] as TabItem;
+
+                if (Settings.Types.Contains((RayType)tabItem.Tag))
+                {
+                    TabCtrl.SelectedIndex = i;
+                    break;
+                }
+            }
         }
 
         public V2raySettings Settings
